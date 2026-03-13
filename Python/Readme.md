@@ -1,55 +1,105 @@
-# Guia de Instalação: Python 3.12
+# Python
 
-Este documento descreve o passo a passo para instalar o Python no Windows, garantindo que ele seja reconhecido globalmente pelo sistema.
-## 1. Download do Instalador
+Esta pasta reúne tudo que você precisa para começar a desenvolver em Python — dos conceitos fundamentais da linguagem até o consumo de APIs e configuração de ambiente.
 
-Acesse o site oficial: python.org/downloads
-Procure pela versão Python 3.12.x (sempre escolha a versão estável mais recente do 3.12).
-Clique em Windows installer (64-bit).
+---
 
-## 2. Processo de Instalação (Ponto Crítico)
+## Estrutura
 
-Ao abrir o instalador, siga estas etapas exatamente nesta ordem:
+```text
+python/
+├── basics/       — fundamentos da linguagem
+├── _env/         — variáveis de ambiente e credenciais
+├── http/
+│   ├── requests/     — requisições HTTP com requests
+│   └── curl_cffi/    — requisições HTTP com curl_cffi
+├── oop/          — orientação a objetos
+├── database/     — conexão e operações com PostgreSQL
+├── browser/      — automação de navegadores
+├── utils/        — utilitários do dia a dia
+├── async/        — programação assíncrona
+├── patterns/     — padrões de código reutilizáveis
+└── testing/      — testes automatizados
+```
 
-Marque a caixa: Add Python 3.12 to PATH (Esta é a opção mais importante!).
+---
 
-(Opcional, mas recomendado) Marque Use admin privileges when installing py.exe.
+## Ordem de aprendizado sugerida
 
-Clique em Install Now.
+```
+basics/  →  _env/  →  http/requests/  →  http/curl_cffi/
+```
 
-***
-Por que marcar o "Add Path"?
+Garanta que está confortável com `basics/` antes de partir para `http/` — dicionários, loops e JSON aparecem em todo código que consome APIs.
 
-Sem isso, você não conseguirá digitar python ou pip no seu terminal (CMD, PowerShell ou terminal do VS Code) sem configurar manualmente as variáveis de ambiente depois.
-***
-## 3. Verificação da Instalação
+---
 
-Após o término da instalação, abra o seu terminal (ou o terminal do VS Code com Ctrl + ') e digite os comandos abaixo para confirmar:
-Verificando a Versão do Python
-Bash
+## Instalação do Python 3.12
+
+### Download
+
+Acesse [python.org/downloads](https://python.org/downloads) e baixe o **Windows installer (64-bit)** da versão 3.12.x.
+
+### Instalação
+
+Ao abrir o instalador, siga esta ordem:
+
+1. Marque **Add Python 3.12 to PATH** — sem isso, `python` e `pip` não funcionam no terminal
+2. (Recomendado) Marque **Use admin privileges when installing py.exe**
+3. Clique em **Install Now**
+
+### Verificação
+
+Após a instalação, abra o terminal (`Ctrl + '` no VS Code) e confirme:
 
 ```bash
 python --version
-``` 
+# Python 3.12.x
 
-Deve retornar: Python 3.12.x
-Verificando o Gerenciador de Pacotes (PIP)
+pip --version
+# pip 24.x.x (...)
+```
 
+### Problemas comuns
+
+| Sintoma | Causa | Solução |
+|---|---|---|
+| `python` abre a Microsoft Store | Alias do Windows sobrepõe o PATH | Pesquisar "Gerenciar aliases de execução de aplicativos" e desativar os aliases do Python |
+| Comando não encontrado | PATH não foi adicionado na instalação | Reinstalar marcando "Add Python 3.12 to PATH" |
+| Funciona no CMD mas não no VS Code | Terminal não foi reiniciado após instalação | Fechar e reabrir o VS Code |
+
+---
+
+## Ambiente virtual
+
+Sempre use um ambiente virtual por projeto — evita conflito de dependências entre projetos diferentes.
 
 ```bash
-pip --version
-``` 
-Deve retornar a versão do pip e o local da instalação.
-## 4. Resolução de Problemas
+# Criar
+python -m venv .venv
 
-Se você digitar python e abrir a Microsoft Store ou der erro de "comando não encontrado":
+# Ativar (Windows)
+.venv\Scripts\activate
 
-Reinicie o VS Code: O terminal precisa ser reiniciado para ler o novo PATH.
+# Ativar (Mac/Linux)
+source .venv/bin/activate
 
-Verifique os aliases: No Windows, pesquise por "Gerenciar aliases de execução de aplicativos" no menu Iniciar e desative os que dizem "Python".
+# Instalar dependências
+pip install requests curl_cffi python-dotenv
 
-### Próximos Passos
+# Salvar dependências do projeto
+pip freeze > requirements.txt
 
-Com o Python 3.12 instalado e no PATH, você já pode criar ambientes virtuais para seus projetos:
-Bash
+# Instalar a partir do requirements.txt
+pip install -r requirements.txt
+```
 
+> O VS Code detecta o `.venv` automaticamente e pergunta se quer usá-lo como interpretador. Clique em **Yes**.
+
+---
+
+## Dependências deste repositório
+
+```bash
+pip install requests curl_cffi python-dotenv psycopg2-binary python-dateutil tenacity pytest pytest-mock aiohttp
+```

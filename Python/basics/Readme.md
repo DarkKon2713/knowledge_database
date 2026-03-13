@@ -1,468 +1,114 @@
-# Conceitos Fundamentais
+# Python — Conceitos Fundamentais
 
-Esta pasta contém **exemplos simples e didáticos de conceitos fundamentais da linguagem Python**.
-O objetivo é servir como **material de estudo para iniciantes**, mostrando de forma clara como funcionam algumas das estruturas mais usadas no dia a dia de quem programa em Python.
-
-Mesmo desenvolvedores experientes utilizam esses conceitos constantemente. Por isso, dominar bem essas bases é essencial antes de avançar para temas mais complexos como APIs, bancos de dados, frameworks web ou automação.
+Esta pasta cobre os conceitos base da linguagem Python. Se você já tem familiaridade com lógica de programação e APIs, o objetivo aqui é mostrar **como Python escreve o que você já conhece**.
 
 ---
 
-# Estrutura da pasta
+## Antes de começar — ambiente virtual
+
+Sempre crie um ambiente virtual antes de instalar qualquer biblioteca. Sem ele, tudo é instalado globalmente no seu Python — e projetos diferentes com versões diferentes de bibliotecas vão conflitar entre si.
+
+```bash
+# Criar o ambiente virtual (uma vez por projeto)
+python -m venv .venv
+
+# Ativar (Windows)
+.venv\Scripts\activate
+
+# Ativar (Mac/Linux)
+source .venv/bin/activate
+
+# Instalar bibliotecas (sempre com o ambiente ativado)
+pip install requests
+
+# Quando o terminal mostrar (.venv) na frente, está ativado
+```
+
+> O VS Code detecta o `.venv` automaticamente e pergunta se quer usá-lo. Clique em **Yes**.
+
+---
 
 ```text
 basics/
-├── dict_examples.py
-├── if_else.py
-├── input_examples.py
-├── list_examples.py
-└── string_methods.py
-```
-
-Cada arquivo aborda um conceito específico da linguagem.
-A ideia é manter **um arquivo simples para cada tema**, facilitando o aprendizado e a consulta rápida.
-
----
-
-# dict_examples.py
-
-Este arquivo demonstra como trabalhar com **dicionários (`dict`) em Python**.
-
-Dicionários são estruturas de dados usadas para armazenar informações no formato:
-
-```
-chave: valor
-```
-
-Eles são muito semelhantes a objetos JSON e aparecem com frequência em:
-
-* respostas de APIs
-* configurações de aplicações
-* estruturas de dados mais complexas
-* armazenamento de informações relacionadas
-
-### Exemplo simples de dicionário
-
-```python
-usuario = {
-    "nome": "Leonardo",
-    "idade": 30,
-    "ativo": True
-}
-```
-
-Neste exemplo criamos um dicionário chamado `usuario` com três informações.
-
-| chave | valor    |
-| ----- | -------- |
-| nome  | Leonardo |
-| idade | 30       |
-| ativo | True     |
-
----
-
-## Acessando valores
-
-Podemos acessar os valores usando a chave correspondente.
-
-```python
-print(usuario["nome"])
-```
-
-Saída:
-
-```
-Leonardo
-```
-
-Essa forma de acesso funciona bem quando temos certeza de que a chave existe.
-
-Porém, se tentarmos acessar uma chave inexistente, ocorrerá um erro:
-
-```
-KeyError
+├── dict_examples.py       — dicionários e acesso a dados
+├── if_else.py             — condicionais e operadores lógicos
+├── input_examples.py      — leitura de entrada do usuário
+├── list_examples.py       — listas, ordenação e filtros
+├── loops_and_functions.py — for, while, def, *args, **kwargs
+├── json_parsing.py        — leitura e escrita de JSON
+├── string_methods.py      — manipulação de strings
+└── error_handling.py      — try/except e tratamento de erros
 ```
 
 ---
 
-## Acessando com segurança usando `.get()`
+## Ordem de leitura sugerida
 
-Para evitar erros quando uma chave pode não existir, usamos o método `.get()`.
+Se você está começando, siga essa ordem:
 
-```python
-print(usuario.get("email"))
-```
+1. `if_else.py` — condicionais e operadores lógicos
+2. `list_examples.py` — listas e iteração
+3. `dict_examples.py` — dicionários (estrutura base do JSON)
+4. `loops_and_functions.py` — loops e funções
+5. `string_methods.py` — manipulação de texto
+6. `json_parsing.py` — leitura e escrita de JSON
+7. `error_handling.py` — como lidar com erros sem derrubar o script
+8. `files.py` — leitura e escrita de arquivos
+9. `type_hints.py` — tipagem estática e documentação de código
+10. `input_examples.py` — leitura de entrada do usuário (scripts interativos)
 
-Saída:
-
-```
-None
-```
-
-Se a chave não existir, o Python retorna `None` ao invés de gerar erro.
-
----
-
-## Definindo um valor padrão
-
-Também podemos definir um valor padrão caso a chave não exista.
-
-```python
-print(usuario.get("email", "Sem email"))
-```
-
-Saída:
-
-```
-Sem email
-```
-
-Esse comportamento é muito útil quando trabalhamos com:
-
-* dados incompletos
-* APIs externas
-* arquivos JSON
-* configurações opcionais
+> Antes de partir para `python/http/`, garanta que está confortável com dicionários, loops e JSON — esses três aparecem em todo código que consome APIs.
 
 ---
 
-## Adicionando novos valores
+## O que cada arquivo cobre
 
-Podemos adicionar novas informações ao dicionário simplesmente atribuindo um valor a uma nova chave.
+### `dict_examples.py`
+Criação, acesso com `[]` e `.get()`, adição, remoção, iteração com `.items()`, dicts aninhados, `.update()` e dict comprehension.
 
-```python
-usuario["email"] = "leo@email.com"
-```
+### `if_else.py`
+Estrutura `if / elif / else`, operadores de comparação, `and / or / not`, valores truthy/falsy, operador `in` e condicional ternário.
 
-Agora o dicionário passa a ter mais uma chave.
+### `input_examples.py`
+Função `input()`, `.strip()` para limpar entradas, conversão de tipos e validação básica.
 
-```python
-{
-    "nome": "Leonardo",
-    "idade": 30,
-    "ativo": True,
-    "email": "leo@email.com"
-}
-```
+### `list_examples.py`
+Criação, acesso por índice, slicing, `append / insert / extend`, `remove / pop / del`, `sorted()` e `sort()`, ordenação de listas de dicts e list comprehension.
 
----
+### `loops_and_functions.py`
+`for` com `enumerate`, iteração sobre listas de dicts, `range`, `while` com paginação, `break / continue`, list comprehension, `def`, parâmetros com valor padrão, retorno múltiplo, `*args` e `**kwargs`.
 
-## Onde dicionários são usados na prática
+### `string_methods.py`
+f-strings, `lower / upper / strip`, `startswith / endswith`, `find / replace / count`, `split / join / splitlines`, fatiamento de strings.
 
-Dicionários aparecem o tempo todo em aplicações Python:
+### `json_parsing.py`
+`json.loads()` e `json.dumps()`, acesso a campos aninhados, `.get()` para campos opcionais, iteração sobre listas de objetos, `indent` e `ensure_ascii`.
 
-Exemplo de resposta de uma API:
+### `error_handling.py`
+`try / except / else / finally`, captura de erros específicos, erros comuns do `requests` (Timeout, ConnectionError, HTTPError), `raise_for_status()`, verificação manual de `status_code` e logging com `logging`.
 
-```python
-resposta_api = {
-    "status": "ok",
-    "data": {
-        "id": 10,
-        "nome": "Produto A",
-        "preco": 19.90
-    }
-}
-```
+### `files.py`
+`open` com context manager, modos de abertura (`r`, `w`, `a`), leitura de texto/linhas, `json.load/dump`, `csv.DictReader/DictWriter`, `os.path` para verificações e listagem de arquivos.
 
-Também são muito usados para representar objetos dentro do código.
+### `type_hints.py`
+Tipos básicos, `list[]`/`dict[]`, `Optional`, `Union`, `Any`, `TypedDict` com campos obrigatórios e opcionais, `Callable`, type alias, sintaxe moderna com `|`.
 
 ---
 
-# if_else.py
+## Erros comuns
 
-Este arquivo mostra como funcionam as **estruturas condicionais em Python**.
-
-Estruturas condicionais permitem que o programa **tome decisões com base em condições**.
-
-A estrutura básica é:
-
-```python
-if condição:
-    código
-elif outra_condição:
-    código
-else:
-    código
-```
+| Erro | Causa | Solução |
+|---|---|---|
+| `KeyError` | Acessar chave inexistente com `[]` | Usar `.get()` ou verificar com `in` |
+| `TypeError` | Operar tipos incompatíveis (ex: `int + str`) | Converter com `int()`, `str()`, `float()` |
+| `IndexError` | Acessar índice fora do range da lista | Verificar `len()` antes ou usar slicing |
+| `JSONDecodeError` | String não é um JSON válido | Envolver `json.loads()` em `try/except` |
+| `FileNotFoundError` | Arquivo não existe no caminho informado | Verificar com `os.path.exists()` antes de abrir |
 
 ---
 
-## Exemplo prático
-
-```python
-numero = 10
-
-if numero > 10:
-    print("Maior que 10")
-elif numero == 10:
-    print("Igual a 10")
-else:
-    print("Menor que 10")
-```
-
-O programa verifica a condição e executa apenas o bloco correspondente.
-
-Fluxo de execução:
-
-1. Python verifica `numero > 10`
-2. Se for falso, verifica `numero == 10`
-3. Se nenhuma condição for verdadeira, executa o `else`
-
----
-
-## Operadores comuns em condições
-
-| operador | significado    |
-| -------- | -------------- |
-| `==`     | igual          |
-| `!=`     | diferente      |
-| `>`      | maior          |
-| `<`      | menor          |
-| `>=`     | maior ou igual |
-| `<=`     | menor ou igual |
-
-Também podemos combinar condições:
-
-```python
-if idade >= 18 and ativo:
-    print("Usuário permitido")
-```
-
----
-
-# input_examples.py
-
-Este arquivo demonstra como ler **dados digitados pelo usuário** usando a função `input()`.
-
-A função `input()` pausa o programa e espera o usuário digitar algo.
-
-Exemplo:
-
-```python
-nome = input("Digite seu nome: ")
-print(nome)
-```
-
----
-
-## Removendo espaços com `.strip()`
-
-Usuários frequentemente digitam espaços sem perceber.
-
-Por isso usamos `.strip()` para remover espaços no início e no final da string.
-
-```python
-nome = input("Digite seu nome: ").strip()
-```
-
-Exemplo:
-
-Entrada do usuário:
-
-```
-   Leonardo
-```
-
-Resultado após `.strip()`:
-
-```
-Leonardo
-```
-
----
-
-## Validando entrada do usuário
-
-Também podemos validar o valor digitado.
-
-```python
-if nome == "":
-    print("Nome vazio")
-else:
-    print(f"Olá {nome}")
-```
-
-Esse tipo de validação é muito comum em:
-
-* formulários
-* CLI tools
-* scripts de automação
-
----
-
-# list_examples.py
-
-Este arquivo demonstra como trabalhar com **listas em Python**.
-
-Listas são usadas para armazenar **vários valores em sequência**.
-
-Exemplo de lista:
-
-```python
-numeros = [10, 20, 30]
-```
-
-Cada valor possui uma **posição (índice)**.
-
-| índice | valor |
-| ------ | ----- |
-| 0      | 10    |
-| 1      | 20    |
-| 2      | 30    |
-
----
-
-## Acessando elementos
-
-```python
-print(numeros[0])
-```
-
-Saída:
-
-```
-10
-```
-
----
-
-## Adicionando elementos
-
-Para adicionar um item usamos `.append()`.
-
-```python
-numeros.append(40)
-```
-
-Agora a lista será:
-
-```
-[10, 20, 30, 40]
-```
-
----
-
-## Removendo elementos
-
-Podemos remover valores usando `.remove()`.
-
-```python
-numeros.remove(20)
-```
-
-Lista resultante:
-
-```
-[10, 30, 40]
-```
-
----
-
-## Uso prático de listas
-
-Listas são usadas em praticamente qualquer programa:
-
-* lista de usuários
-* lista de produtos
-* resultados de consultas
-* processamento de dados
-
-Exemplo:
-
-```python
-usuarios = ["Ana", "João", "Carlos"]
-```
-
----
-
-# string_methods.py
-
-Este arquivo mostra alguns **métodos importantes para trabalhar com strings**.
-
-Strings representam **texto em Python**.
-
-Exemplo:
-
-```python
-texto = "python"
-```
-
----
-
-## Removendo espaços com `.strip()`
-
-```python
-texto = "   python   "
-texto = texto.strip()
-```
-
-Resultado:
-
-```
-python
-```
-
----
-
-## Dividindo texto com `.split()`
-
-O método `.split()` divide uma string em várias partes.
-
-```python
-texto = "python,java,go"
-linguagens = texto.split(",")
-```
-
-Resultado:
-
-```
-["python", "java", "go"]
-```
-
----
-
-## Percorrendo listas com `for`
-
-Depois de usar `.split()`, normalmente percorremos os valores.
-
-```python
-for linguagem in linguagens:
-    print(linguagem)
-```
-
-Saída:
-
-```
-python
-java
-go
-```
-
----
-
-# Por que esses conceitos são importantes
-
-Os exemplos desta pasta cobrem alguns dos conceitos mais usados na linguagem Python:
-
-* estruturas condicionais
-* listas
-* dicionários
-* manipulação de strings
-* entrada de dados
-
-Essas estruturas aparecem em praticamente **todo código Python**, desde scripts simples até aplicações complexas.
-
-Dominar bem esses conceitos facilita muito o aprendizado de tópicos mais avançados como:
-
-* APIs
-* automação
-* análise de dados
-* desenvolvimento web
-* machine learning
-
----
-
-# Documentação oficial Python
-
-Para aprofundar o conhecimento, consulte a documentação oficial:
-
-https://docs.python.org/3/tutorial/
+## Documentação oficial
+
+- Python: https://docs.python.org/3/tutorial/
+- Biblioteca `json`: https://docs.python.org/3/library/json.html
+- Biblioteca `logging`: https://docs.python.org/3/library/logging.html

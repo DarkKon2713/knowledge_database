@@ -1,79 +1,175 @@
-# Importa a implementação de requests da biblioteca curl_cffi
-# Ela funciona de forma parecida com a biblioteca requests tradicional,
-# porém usa libcurl internamente (mais próximo do comportamento de navegadores).
+# =============================================================================
+# Requisição POST com JSON usando curl_cffi
+# =============================================================================
+# Funciona igual ao requests — json= serializa o dict e define o Content-Type.
+# O diferencial é o impersonate e http_version, que tornam a requisição
+# indistinguível de um navegador real para servidores com detecção de bots.
+#
+# Instalação:
+#   pip install curl_cffi python-dotenv
+# =============================================================================
+
 from curl_cffi import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+API_URL   = os.getenv("API_URL", "https://httpbin.org")
+API_TOKEN = os.getenv("API_TOKEN")
 
 
-# API de teste que aceita POST e devolve os dados enviados
-URL_POST = "https://httpbin.org/post"
-
+# -----------------------------------------------------------------------------
+# POST JSON — exemplo base
+# -----------------------------------------------------------------------------
 
 def exemplo_post_json():
     """
-    Exemplo de requisição POST enviando um payload JSON usando curl_cffi.
-
-    Quando usamos o parâmetro json= :
-
-    1) Um dict Python é convertido automaticamente para JSON
-    2) O header "Content-Type: application/json" é adicionado automaticamente
-    3) O corpo da requisição é enviado em formato JSON
+    Envia JSON com TLS fingerprint de navegador real.
     """
-
-    # Payload que será enviado para a API
     payload = {
-        "usuario": "leonardo",
-        "senha": "123456",
-        "ativo": True,
-        "roles": ["admin", "dev"]
+        "titulo":     "Erro ao fazer login",
+        "prioridade": "alta",
+        "usuario_id": 42,
     }
 
-    # Faz a requisição POST enviando JSON
-    response = requests.post(
-        url=URL_POST,
+    try:
+        response = requests.post(
+            f"{API_URL}/post",
+            json=payload,
+            impersonate="chrome",
+            timeout=5
+        )
+        response.raise_for_status()
+        resultado = response.json()
 
-        # O dict Python será convertido automaticamente para JSON
-        json=payload,
+        print(f"Status: {response.status_code}")
+        print(f"Protocolo: HTTP/{response.http_version}")
+        print(f"Content-Type enviado: {response.request.headers.get('Content-Type')}")
+        print(f"Como o servidor recebeu: {resultado['json']}")
 
-        # Simula requisição de um navegador real
-        # Isso altera headers, TLS fingerprint e outros detalhes
-        impersonate="chrome",
-
-        # Define qual versão do HTTP será usada
-        # v1 = HTTP/1.1
-        # v2 = HTTP/2
-        # v3 = HTTP/3 (quando suportado)
-        http_version="v2"
-    )
-
-    # Converte a resposta da API para um dict Python
-    resultado = response.json()
-
-    print("\n====== EXEMPLO - POST COM JSON (curl_cffi) ======\n")
-
-    # Código HTTP retornado pela API
-    print(f"Status HTTP: {response.status_code}")
-
-    # Mostra a versão HTTP usada
-    print("\nVersão HTTP utilizada:")
-    print(response.http_version)
-
-    # Mostra o payload original em Python
-    print("\nPayload enviado (dict Python):")
-    print(payload)
-
-    # Mostra o header Content-Type enviado na requisição
-    print("\nHeader Content-Type enviado:")
-    print(response.request.headers.get("Content-Type"))
-
-    # httpbin retorna os dados recebidos dentro do campo "json"
-    print("\nJSON recebido pela API:")
-    print(resultado["json"])
-
-    # Mostra a resposta completa da API
-    print("\nResposta completa da API:")
-    print(resultado)
+    except requests.exceptions.Timeout:
+        print("Timeout — servidor demorou mais de 5 segundos.")
+    except requests.exceptions.HTTPError as e:
+        print(f"Erro HTTP {e.response.status_code}: {e}")
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
 
 
-# Executa apenas se o arquivo for rodado diretamente
+# -----------------------------------------------------------------------------
+# Caso de uso real — criar ticket
+# -----------------------------------------------------------------------------
+
+def criar_ticket(titulo, descricao, prioridade="normal", usuario_id=None):
+    """
+    Cria ticket via POST JSON simulando navegador.
+    Útil quando a API tem WAF ou proteção contra bots.
+    """
+    headers = {
+        "Authorization": f"Bearer {API_TOKEN}",
+        "Content-Type":  "application/json",
+    }
+
+    payload = {
+        "titulo":     titulo,
+        "descricao":  descricao,
+        "prioridade": prioridade,
+        "status":     "aberto",
+    }
+
+    if usuario_id:
+        payload["usuario_id"] = usuario_id
+
+    try:
+        response = requests.post(
+            f"{API_URL}/tickets",
+            headers=headers,
+            json=payload,
+            impersonate="chrome",
+            http_version="v2",
+            timeout=5
+        )
+        response.raise_for_status()
+
+        ticket = response.json()
+        print(f"Ticket criado: #{ticket.get('id')} — {ticket.get('titulo')}")
+        return ticket
+
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 400:
+            erros = e.response.json().get("erros", [])
+            print(f"Dados inválidos: {erros}")
+        elif e.response.status_code == 401:
+            print("Não autorizado — verifique o API_TOKEN no .env.")
+        elif e.response.status_code == 422:
+            print(f"Erro de validação: {e.response.json()}")
+        else:
+            print(f"Erro HTTP {e.response.status_code}: {e}")
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+
+    return None
+
+
+# -----------------------------------------------------------------------------
+# PATCH e DELETE — idênticos ao requests, com impersonate
+# -----------------------------------------------------------------------------
+
+def atualizar_ticket(ticket_id, campos):
+    """PATCH — atualiza apenas os campos enviados."""
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
+    try:
+        response = requests.patch(
+            f"{API_URL}/tickets/{ticket_id}",
+            headers=headers,
+            json=campos,
+            impersonate="chrome",
+            timeout=5
+        )
+        response.raise_for_status()
+        return response.json()
+
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 404:
+            print(f"Ticket #{ticket_id} não encontrado.")
+        else:
+            print(f"Erro HTTP {e.response.status_code}: {e}")
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+
+    return None
+
+
+def fechar_ticket(ticket_id):
+    """DELETE — 204 = sucesso sem corpo, não chamar .json()."""
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
+    try:
+        response = requests.delete(
+            f"{API_URL}/tickets/{ticket_id}",
+            headers=headers,
+            impersonate="chrome",
+            timeout=5
+        )
+        response.raise_for_status()
+
+        if response.status_code == 204:
+            print(f"Ticket #{ticket_id} removido.")
+            return True
+
+        return response.json()
+
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 404:
+            print(f"Ticket #{ticket_id} não encontrado.")
+        else:
+            print(f"Erro HTTP {e.response.status_code}: {e}")
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+
+    return False
+
+
 if __name__ == "__main__":
     exemplo_post_json()

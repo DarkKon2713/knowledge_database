@@ -1,362 +1,149 @@
-# Biblioteca Python curl_cffi
+# curl_cffi
 
-## Introdução
+## O que é TLS fingerprint?
 
-`curl_cffi` é uma biblioteca Python que permite fazer requisições HTTP
-utilizando o **libcurl** através de **CFFI (C Foreign Function
-Interface)**.
+Quando seu navegador se conecta a um site via HTTPS, ele faz um "aperto de mão" (handshake) com o servidor. Durante esse handshake, o cliente envia informações técnicas sobre si mesmo — algoritmos suportados, versão do protocolo, ordem das opções. Esse conjunto de informações forma uma "impressão digital" (fingerprint) única.
 
-Ela foi criada para oferecer:
+Sites com proteção anti-bot analisam esse fingerprint e conseguem identificar que a requisição veio de um script Python (requests) e não de um Chrome real — e bloqueiam.
 
--   alta performance
--   suporte a protocolos modernos
--   melhor compatibilidade com sites que bloqueiam bots
+O `curl_cffi` resolve isso simulando exatamente o fingerprint de um navegador real, tornando a requisição indistinguível de um usuário abrindo o site no Chrome.
 
-Uma das principais vantagens é que ela consegue **imitar navegadores
-reais**, algo que bibliotecas como `requests` nem sempre conseguem.
+---Biblioteca HTTP que usa libcurl internamente. A API é quase idêntica ao `requests` — a diferença está em dois parâmetros extras: `impersonate` e `http_version`.
 
-Isso torna `curl_cffi` muito útil para:
-
--   scraping avançado
--   bypass de bloqueios simples
--   automação web
--   requisições HTTP de alta performance
-
-------------------------------------------------------------------------
-
-# Instalação
-
-A instalação é feita via pip.
-
-``` bash
-pip install curl_cffi
+```bash
+pip install curl_cffi python-dotenv
 ```
 
-Depois disso a biblioteca pode ser importada no Python.
+---
 
-``` python
-from curl_cffi import requests
+## Quando usar curl_cffi em vez de requests
+
+| Situação | requests | curl_cffi |
+|---|---|---|
+| API REST simples sem proteção | ✓ | ✓ |
+| API que bloqueia por TLS fingerprint | ✗ | ✓ |
+| Precisa de HTTP/2 ou HTTP/3 | ✗ | ✓ |
+| Scraping com detecção de bot | ✗ | ✓ |
+| WAF ou Cloudflare bloqueando | ✗ | ✓ |
+
+Se `requests` funciona, não há motivo para trocar.
+
+---
+
+## Estrutura
+
+```text
+curl_cffi/
+├── Readme.md
+└── examples/
+    ├── get_request.py       — GET, params, paginação, Session
+    ├── post_form_data.py    — POST form-data, OAuth2, upload de arquivo
+    └── post_json.py         — POST/PATCH/DELETE com JSON
 ```
 
-A API foi projetada para ser **muito parecida com a biblioteca
-requests**.
+---
 
-------------------------------------------------------------------------
+## Referência rápida
 
-# Primeiro Exemplo
+### GET
 
-``` python
-from curl_cffi import requests
-
-r = requests.get("https://httpbin.org/get")
-
-print(r.status_code)
-print(r.text)
-```
-
-Explicação:
-
--   `requests.get()` faz uma requisição HTTP GET
--   `status_code` mostra o código de resposta
--   `text` contém o conteúdo retornado pelo servidor
-
-------------------------------------------------------------------------
-
-# Diferença entre curl_cffi e requests
-
-  Biblioteca   Base          Objetivo
-  ------------ ------------- -------------------------------
-  requests     Python puro   simplicidade
-  curl_cffi    libcurl (C)   performance e compatibilidade
-
-`curl_cffi` usa internamente o **libcurl**, que é a mesma tecnologia
-usada por:
-
--   curl (linha de comando)
--   navegadores
--   ferramentas de rede
-
-------------------------------------------------------------------------
-
-# Fazendo Requisições GET
-
-``` python
+```python
 from curl_cffi import requests
 
 response = requests.get(
-    "https://api.github.com/repos/python/cpython"
-)
-
-print(response.status_code)
-print(response.json())
-```
-
-A função `json()` converte automaticamente a resposta JSON para um
-dicionário Python.
-
-------------------------------------------------------------------------
-
-# Enviando Parâmetros (Query Params)
-
-``` python
-from curl_cffi import requests
-
-params = {
-    "q": "python",
-    "sort": "stars"
-}
-
-r = requests.get(
-    "https://api.github.com/search/repositories",
-    params=params
-)
-
-print(r.url)
-```
-
-A URL final será:
-
-    https://api.github.com/search/repositories?q=python&sort=stars
-
-------------------------------------------------------------------------
-
-# Enviando Dados com POST
-
-``` python
-from curl_cffi import requests
-
-data = {
-    "username": "admin",
-    "password": "123"
-}
-
-r = requests.post(
-    "https://httpbin.org/post",
-    data=data
-)
-
-print(r.json())
-```
-
-POST é usado quando precisamos **enviar dados para o servidor**.
-
-------------------------------------------------------------------------
-
-# Enviando JSON
-
-``` python
-from curl_cffi import requests
-
-payload = {
-    "nome": "Nemo",
-    "tipo": "Peixe"
-}
-
-r = requests.post(
-    "https://httpbin.org/post",
-    json=payload
-)
-
-print(r.json())
-```
-
-Quando usamos `json=`:
-
--   o dicionário é convertido automaticamente
--   o header `Content-Type: application/json` é enviado
-
-------------------------------------------------------------------------
-
-# Headers HTTP
-
-Headers permitem enviar informações adicionais na requisição.
-
-Exemplo:
-
-``` python
-from curl_cffi import requests
-
-headers = {
-    "User-Agent": "Mozilla/5.0",
-    "Accept": "application/json"
-}
-
-r = requests.get(
-    "https://httpbin.org/headers",
-    headers=headers
-)
-
-print(r.json())
-```
-
-Headers comuns:
-
-  Header          Uso
-  --------------- ---------------------------
-  User-Agent      identificar cliente
-  Accept          tipo de resposta esperado
-  Authorization   autenticação
-
-------------------------------------------------------------------------
-
-# Simulando Navegadores
-
-Uma das funcionalidades mais poderosas do `curl_cffi` é **impersonar
-navegadores**.
-
-Isso ajuda a evitar bloqueios de scraping.
-
-Exemplo:
-
-``` python
-from curl_cffi import requests
-
-r = requests.get(
-    "https://example.com",
-    impersonate="chrome110"
-)
-
-print(r.status_code)
-```
-
-Isso faz a requisição parecer que veio do **Chrome versão 110**.
-
-Outros exemplos:
-
-    chrome110
-    chrome120
-    safari15
-    edge101
-
-------------------------------------------------------------------------
-
-# Sessões
-
-Sessões permitem reutilizar conexão e manter cookies.
-
-``` python
-from curl_cffi import requests
-
-session = requests.Session()
-
-session.get("https://httpbin.org/cookies/set/test/123")
-
-r = session.get("https://httpbin.org/cookies")
-
-print(r.text)
-```
-
-Benefícios:
-
--   reutilização de conexão
--   persistência de cookies
--   melhor performance
-
-------------------------------------------------------------------------
-
-# Timeout
-
-Sempre defina timeout para evitar travamentos.
-
-``` python
-from curl_cffi import requests
-
-r = requests.get(
-    "https://httpbin.org/delay/2",
+    "https://api.exemplo.com/tickets",
+    headers={"Authorization": "Bearer TOKEN"},
+    params={"status": "aberto"},
+    impersonate="chrome",
+    http_version="v2",
     timeout=5
 )
-
-print(r.status_code)
+response.raise_for_status()
+dados = response.json()
 ```
 
-------------------------------------------------------------------------
+### POST JSON
 
-# Tratamento de Erros
+```python
+response = requests.post(
+    "https://api.exemplo.com/tickets",
+    headers={"Authorization": "Bearer TOKEN"},
+    json={"titulo": "Erro ao logar", "prioridade": "alta"},
+    impersonate="chrome",
+    timeout=5
+)
+```
 
-``` python
-from curl_cffi import requests
+---
 
+## Parâmetros exclusivos do curl_cffi
+
+### `impersonate`
+
+Simula um navegador real — altera TLS fingerprint, headers e comportamento da conexão.
+
+| Valor | Navegador simulado |
+|---|---|
+| `"chrome"` | Chrome (versão mais recente) |
+| `"chrome110"` | Chrome versão 110 |
+| `"safari"` | Safari (versão mais recente) |
+| `"safari15_5"` | Safari versão 15.5 |
+| `"edge"` | Edge (versão mais recente) |
+| `"firefox"` | Firefox (versão mais recente) |
+
+Use `"chrome"` na maioria dos casos — é o mais comum e bem mantido.
+
+### `http_version`
+
+| Valor | Protocolo |
+|---|---|
+| `"v1"` | HTTP/1.1 |
+| `"v2"` | HTTP/2 |
+| `"v3"` | HTTP/3 (quando suportado pelo servidor) |
+
+### `response.http_version`
+
+Campo exclusivo do curl_cffi — informa qual protocolo foi efetivamente usado na conexão.
+
+```python
+print(response.http_version)   # "2" ou "3"
+```
+
+---
+
+## Tratamento de erros
+
+Igual ao `requests`:
+
+```python
 try:
+    response = requests.get(url, impersonate="chrome", timeout=5)
+    response.raise_for_status()
+    return response.json()
 
-    r = requests.get("https://api.github.com", timeout=5)
+except requests.exceptions.Timeout:
+    print("Timeout.")
 
-    r.raise_for_status()
+except requests.exceptions.ConnectionError:
+    print("Falha de conexão.")
 
-    print(r.json())
+except requests.exceptions.HTTPError as e:
+    print(f"Erro HTTP {e.response.status_code}: {e}")
 
 except Exception as e:
-
-    print("Erro:", e)
+    print(f"Erro inesperado: {e}")
 ```
 
-------------------------------------------------------------------------
+> curl_cffi não tem subclasses tão específicas quanto o `requests`.
+> Use `Exception` como fallback para erros não mapeados.
 
-# Upload de Arquivos
+---
 
-``` python
-from curl_cffi import requests
+## Erros comuns
 
-files = {
-    "file": open("arquivo.txt", "rb")
-}
-
-r = requests.post(
-    "https://httpbin.org/post",
-    files=files
-)
-
-print(r.status_code)
-```
-
-`rb` significa **read binary**.
-
-------------------------------------------------------------------------
-
-# Vantagens do curl_cffi
-
-Principais vantagens:
-
--   usa libcurl (muito estável)
--   consegue imitar navegadores
--   maior compatibilidade com sites protegidos
--   suporte melhor a HTTP2
--   mais rápido em algumas situações
-
-------------------------------------------------------------------------
-
-# Quando usar curl_cffi
-
-Use quando:
-
--   sites bloqueiam `requests`
--   precisa imitar navegador
--   scraping avançado
--   alta performance em requisições
-
-Para automação simples, `requests` ainda é suficiente.
-
-------------------------------------------------------------------------
-
-# Mini Exemplo Real
-
-Buscar informações de um repositório do GitHub.
-
-``` python
-from curl_cffi import requests
-
-url = "https://api.github.com/repos/python/cpython"
-
-r = requests.get(url)
-
-data = r.json()
-
-print("Nome:", data["name"])
-print("Stars:", data["stargazers_count"])
-print("URL:", data["html_url"])
-```
-
-Saída exemplo:
-
-    Nome: cpython
-    Stars: 60000
-    URL: https://github.com/python/cpython
+| Erro | Causa | Solução |
+|---|---|---|
+| `ImpersonateError` | Valor de `impersonate` inválido | Usar um dos valores da tabela acima |
+| Ainda bloqueado com `impersonate` | Site usa detecção mais avançada (JS, comportamento) | curl_cffi resolve TLS — JS challenge precisa de Playwright/Selenium |
+| `JSONDecodeError` | Resposta não é JSON | Verificar `response.text` antes de `.json()` |
+| `204` quebrando em `.json()` | Resposta sem corpo | Checar `status_code` antes de chamar `.json()` |
