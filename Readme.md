@@ -7,6 +7,8 @@ Base de conhecimento para quem está começando a desenvolver em Python. O mater
 ## Estrutura
 
 ```text
+├── wsl/
+│   └── Readme.md                        — instalação e configuração do WSL no Windows
 ├── VSCode/
 │   └── Readme.md                        — configuração do ambiente e extensões
 ├── git/
@@ -74,9 +76,10 @@ Base de conhecimento para quem está começando a desenvolver em Python. O mater
 Domine essa base antes de avançar. São os conceitos que aparecem em todo código Python.
 
 ```
-1. git/
-2. VSCode/
-3. python/basics/
+1. wsl/           (se estiver no Windows)
+2. git/
+3. VSCode/
+4. python/basics/
    ├── if_else.py
    ├── list_examples.py
    ├── dict_examples.py
@@ -176,6 +179,7 @@ playwright install chromium
 
 | Pasta | Conteúdo |
 |---|---|
+| `wsl/` | Instalação do WSL no Windows, integração com VS Code, Git no WSL |
 | `git/` | Instalação, configuração, SSH, clone, add, commit, push, pull, branch |
 | `VSCode/` | Configuração do ambiente Python, extensões, debug, boas práticas |
 | `python/basics/` | if/else, listas, dicts, loops, funções, strings, JSON, arquivos, type hints |
