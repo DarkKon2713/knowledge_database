@@ -9,6 +9,8 @@ Base de conhecimento para quem está começando a desenvolver em Python. O mater
 ```text
 ├── wsl/
 │   └── Readme.md                        — instalação e configuração do WSL no Windows
+├── docker/
+│   └── Readme.md                        — instalação no WSL, containers, imagens e Compose
 ├── VSCode/
 │   └── Readme.md                        — configuração do ambiente e extensões
 ├── git/
@@ -77,9 +79,10 @@ Domine essa base antes de avançar. São os conceitos que aparecem em todo códi
 
 ```
 1. wsl/           (se estiver no Windows)
-2. git/
-3. VSCode/
-4. python/basics/
+2. docker/
+3. git/
+4. VSCode/
+5. python/basics/
    ├── if_else.py
    ├── list_examples.py
    ├── dict_examples.py
@@ -89,35 +92,35 @@ Domine essa base antes de avançar. São os conceitos que aparecem em todo códi
    ├── error_handling.py
    ├── files.py
    └── input_examples.py
-4. python/_env/
-5. python/http/requests/
+6. python/_env/
+7. python/http/requests/
 ```
 
 ### 🟡 Pleno — após dominar o básico
 
 ```
-6. python/basics/type_hints.py
-7. python/oop/
+8. python/basics/type_hints.py
+9. python/oop/
    ├── functions.py       (lambdas, closures, decorators)
    └── classes.py         (herança, polimorfismo, @classmethod)
-8. python/utils/
-   ├── datetime_examples.py
-   ├── regex_examples.py
-   └── logging_config.py
-9. python/http/curl_cffi/
-10. python/database/
-11. python/patterns/
+10. python/utils/
+    ├── datetime_examples.py
+    ├── regex_examples.py
+    └── logging_config.py
+11. python/http/curl_cffi/
+12. python/database/
+13. python/patterns/
     ├── pagination.py
     ├── retry.py
     └── rate_limit.py
-12. python/testing/
+14. python/testing/
 ```
 
 ### 🔴 Avançado — diferencial de sênior
 
 ```
-13. python/async/
-14. python/browser/
+15. python/async/
+16. python/browser/
     ├── playwright_example.py   (mais moderno)
     └── drissionpage_example.py (modo híbrido)
 ```
@@ -131,6 +134,7 @@ Domine essa base antes de avançar. São os conceitos que aparecem em todo códi
 | `if/else`, listas, dicts, loops, funções | 🟢 Junior |
 | Strings, JSON, arquivos, `input()` | 🟢 Junior |
 | Variáveis de ambiente, `.env` | 🟢 Junior |
+| Docker — instalar no WSL, `run`, `ps`, `logs`, `exec` | 🟢 Junior |
 | GET/POST com `requests`, tratamento de erro HTTP | 🟢 Junior |
 | Type hints básicos (`str`, `int`, `list`, `dict`) | 🟢 Junior |
 | `try/except`, erros específicos, `logging` básico | 🟢 Junior |
@@ -180,6 +184,7 @@ playwright install chromium
 | Pasta | Conteúdo |
 |---|---|
 | `wsl/` | Instalação do WSL no Windows, integração com VS Code, Git no WSL |
+| `docker/` | Instalação no WSL, imagens, containers, volumes, Docker Compose |
 | `git/` | Instalação, configuração, SSH, clone, add, commit, push, pull, branch |
 | `VSCode/` | Configuração do ambiente Python, extensões, debug, boas práticas |
 | `python/basics/` | if/else, listas, dicts, loops, funções, strings, JSON, arquivos, type hints |
