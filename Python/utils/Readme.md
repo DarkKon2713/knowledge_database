@@ -1,6 +1,6 @@
 # Python — Utils
 
-Utilitários do dia a dia — manipulação de datas e expressões regulares.
+Utilitários do dia a dia — datas, regex, logging e debugging.
 
 ```bash
 pip install python-dateutil
@@ -14,7 +14,9 @@ pip install python-dateutil
 utils/
 ├── datetime_examples.py   — datas, horários, timedelta, SLA
 ├── regex_examples.py      — busca, extração e validação com regex
-├── logging_config.py      — logging com handlers, rotação e múltiplos destinos
+├── logging_config.py      — configuração de logging: handlers, rotação, múltiplos destinos
+├── log_handling.py        — tratamento de logs: exceções, contexto, LoggerAdapter
+├── print_debug.py         — print vs logging, pprint, f-string com =, progresso
 └── Readme.md
 ```
 
@@ -61,6 +63,31 @@ utils/
 | `TimedRotatingFileHandler` | Rotação por tempo (diária, semanal) |
 | Silenciar libs externas | `logging.getLogger("urllib3").setLevel(WARNING)` |
 
+### `log_handling.py`
+
+| Conceito | Descrição |
+|---|---|
+| `logger.exception()` | Loga erro + traceback completo (usar dentro de `except`) |
+| `logger.error()` | Loga erro sem traceback (quando erro já é esperado) |
+| `exc_info=True` | Adiciona traceback em qualquer nível (`warning`, `info`) |
+| `% formatting` | `logger.info("%s", val)` — lazy, não formata se nível inativo |
+| `extra={}` | Adiciona campos customizados acessíveis no formatter |
+| `LoggerAdapter` | Contexto persistente sem repetir `extra=` a cada chamada |
+| `propagate=False` | Impede logs de subirem para o logger raiz (evita duplicação) |
+| Loop com progresso | Logar a cada N iterações para evitar flood |
+
+### `print_debug.py`
+
+| Conceito | Descrição |
+|---|---|
+| Quando usar print | Scripts simples, notebooks, saída para usuário, debug rápido |
+| Quando usar logging | Produção, múltiplos módulos, timestamp, filtro por nível |
+| `sep=`, `end=`, `flush=` | Parâmetros de print para controlar saída |
+| `f"{var=}"` | Mostra nome e valor automaticamente (Python 3.8+) |
+| `pprint.pprint()` | Formata dicts/listas complexas com indentação |
+| `pprint.pformat()` | Retorna string formatada (para passar ao logging) |
+| Progresso com `\r` | Sobrescreve linha no terminal sem criar novas linhas |
+
 | Padrão | Significado |
 |---|---|
 | `\d` | Dígito (0-9) |
@@ -86,3 +113,6 @@ utils/
 | `AttributeError: 'NoneType'` | `re.search()` retornou `None` | Verificar `if match:` antes de `.group()` |
 | Datas com timezone incompatível | Misturar datetime com e sem timezone | Usar sempre `tz=timezone.utc` ou sempre sem timezone |
 | `logging` duplicando mensagens | `basicConfig()` chamado mais de uma vez | Limpar handlers com `logger.handlers.clear()` antes de adicionar |
+| `logger.exception()` fora de `except` | Chamado fora de bloco de exceção — traceback fica vazio | Usar só dentro de `except`, ou usar `logger.error()` fora |
+| `logger.info(f"val={x}")` | f-string sempre formata, mesmo se nível inativo | Usar `logger.info("val=%s", x)` para lazy formatting |
+| `KeyError` no formatter com `extra` | Campo do `extra={}` não definido em todas as chamadas | Usar `LoggerAdapter` para garantir contexto em todos os logs |
